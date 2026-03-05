@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Urban Fincrop - Mega App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { --primary-dark: #0A3224; --primary: #125B42; --accent: #E58A1F; --bg-light: #F5F7FA; --card-bg: #FFFFFF; --text-main: #1A1E25; --text-muted: #7A869A; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #e2e8f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .app-container { width: 100%; max-width: 400px; height: 850px; max-height: 100vh; background: var(--bg-light); position: relative; overflow: hidden; box-shadow: 0 20px 40px rgba(0,0,0,0.15); border-radius: 35px; }
+        .screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: none; overflow-y: auto; padding-bottom: 90px; background: var(--bg-light); }
+        .screen.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+
+        /* AUTH SCREEN */
+        #authScreen { background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; padding: 30px 20px; text-align: center; }
+        .auth-logo i { font-size: 50px; color: var(--accent); margin-top: 10px; margin-bottom: 15px; }
+        .auth-box { background: white; padding: 25px 20px; border-radius: 25px; margin-top: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .input-group { margin-bottom: 15px; text-align: left; }
+        .input-group label { display: block; font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #e0e0e0; border-radius: 12px; font-size: 14px; outline: none; }
+        .auth-btn { width: 100%; background: var(--primary); color: white; padding: 15px; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 10px; }
+        .error-text { color: red; font-size: 12px; margin-top: 10px; display: none; }
+        .dsa-hero-btn { background: var(--accent); color: white; width: 100%; padding: 15px; border-radius: 15px; border: none; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 25px; box-shadow: 0 5px 15px rgba(229, 138, 31, 0.4); display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* DSA SCREEN */
+        .back-header { display: flex; align-items: center; gap: 15px; padding: 25px 20px 15px; background: var(--bg-light); position: sticky; top: 0; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+        .back-header i { font-size: 18px; cursor: pointer; width: 40px; height: 40px; background: white; display: flex; align-items: center; justify-content: center; border-radius: 50%; color: var(--text-main); }
+        .back-header h2 { font-size: 18px; font-weight: 700; color: var(--text-main); }
+        .dsa-form { padding: 0 20px; }
+        .submit-dsa-btn { width: 100%; padding: 15px; background: var(--accent); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 15px; }
+
+        /* DASHBOARD */
+        .header { padding: 25px 20px 15px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-light); position: sticky; top: 0; z-index: 10; }
+        .user-profile { display: flex; align-items: center; gap: 12px; }
+        .avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 600; text-transform: uppercase; }
+        .greeting p { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 2px; }
+        .greeting h3 { font-size: 15px; color: var(--text-main); font-weight: 700; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
+        .hero-banner { margin: 10px 20px 25px; padding: 25px 20px; border-radius: 20px; background: linear-gradient(135deg, var(--primary-dark), var(--primary)); color: white; }
+        .hero-banner h2 { font-size: 20px; margin-bottom: 8px; }
+        .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; padding: 0 20px; }
+        .service-item { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+        .service-icon { width: 60px; height: 60px; background: var(--card-bg); border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .service-item span { font-size: 11px; font-weight: 600; color: var(--text-main); text-align: center; line-height: 1.2;}
+        .logout-btn { background: #ff4757; color: white; padding: 8px 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 12px;}
+
+        /* PARTNER LIST */
+        .partner-list { padding: 10px 20px; display: flex; flex-direction: column; gap: 12px; }
+        .partner-card { background: var(--card-bg); border-radius: 18px; padding: 18px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; }
+        .partner-top { display: flex; justify-content: space-between; align-items: center; }
+        .partner-brand { display: flex; align-items: center; gap: 12px; }
+        .p-logo { width: 45px; height: 45px; border-radius: 12px; background: var(--bg-light); display: flex; align-items: center; justify-content: center; font-weight: 800; color: var(--primary-dark); font-size: 13px; }
+        .p-name { font-size: 14px; font-weight: 700; color: var(--text-main); }
+        .p-type { font-size: 10px; color: var(--accent); font-weight: 600; background: rgba(229, 138, 31, 0.1); padding: 3px 8px; border-radius: 8px; display: inline-block; margin-top: 3px; }
+        .partner-stats { display: flex; justify-content: space-between; background: var(--bg-light); padding: 10px; border-radius: 10px; }
+        .stat { text-align: center; }
+        .stat span { display: block; font-size: 9px; color: var(--text-muted); font-weight: 600; margin-bottom: 2px; text-transform: uppercase; }
+        .stat strong { font-size: 12px; color: var(--text-main); font-weight: 700; }
+        .apply-btn { width: 100%; padding: 10px; border-radius: 10px; border: none; background: var(--primary); color: white; font-size: 13px; font-weight: 600; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+
+        <div id="authScreen" class="screen active">
+            <div class="auth-logo"><i class="fa-solid fa-leaf"></i></div>
+            <h2>Urban Fincrop</h2>
+            <p style="font-size: 14px; opacity: 0.8; margin-top: 5px;">Login with Email OTP</p>
+
+            <div class="auth-box">
+                <div id="emailSection">
+                    <div class="input-group">
+                        <label>Email Address</label>
+                        <input type="email" id="emailInput" placeholder="Enter your email">
+                    </div>
+                    <button class="auth-btn" onclick="sendDemoOTP()">Get OTP</button>
+                </div>
+
+                <div id="otpSection" style="display: none;">
+                    <div class="input-group">
+                        <label>Enter 4-Digit OTP</label>
+                        <input type="number" id="otpInput" placeholder="Enter OTP">
+                    </div>
+                    <button class="auth-btn" onclick="verifyDemoOTP()">Verify & Login</button>
+                    <p style="font-size: 12px; color: var(--primary); margin-top: 15px; cursor: pointer;" onclick="resetAuth()">Change Email</p>
+                </div>
+                <p class="error-text" id="errorMsg"></p>
+            </div>
+
+            <button class="dsa-hero-btn" onclick="switchScreen('dsaScreen')">
+                <i class="fa-solid fa-handshake"></i> Become a DSA Partner
+            </button>
+        </div>
+
+        <div id="dsaScreen" class="screen">
+            <div class="back-header">
+                <i class="fa-solid fa-angle-left" onclick="switchScreen('authScreen')"></i>
+                <h2>DSA Registration</h2>
+            </div>
+            
+            <form action="https://formsubmit.co/TUMHARI_EMAIL@gmail.com" method="POST" class="dsa-form">
+                <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">Join our elite partner network.</p>
+                
+                <div class="input-group"><label>Full Name</label><input type="text" name="DSA_Name" placeholder="E.g. Vikas Kumar" required></div>
+                <div class="input-group"><label>Email Address</label><input type="email" name="Email" placeholder="Enter email" required></div>
+                <div class="input-group"><label>Phone Number</label><input type="tel" name="Phone" placeholder="+91 XXXXX XXXXX" required></div>
+                <div class="input-group"><label>PAN Card Number</label><input type="text" name="PAN_Card" placeholder="ABCDE1234F" style="text-transform: uppercase;" required></div>
+                
+                <input type="hidden" name="_captcha" value="false">
+                <input type="hidden" name="_subject" value="New DSA Partner Registration!">
+                <input type="hidden" name="_next" value="https://google.com"> <button type="submit" class="submit-dsa-btn">Submit Application</button>
+            </form>
+        </div>
+
+        <div id="homeScreen" class="screen">
+            <div class="header">
+                <div class="user-profile">
+                    <div class="avatar" id="userAvatar">U</div>
+                    <div class="greeting">
+                        <p>Welcome back,</p>
+                        <h3 id="displayUserEmail">User</h3>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logoutUser()">Logout</button>
+            </div>
+
+            <div class="hero-banner">
+                <h2>Mega Loan Hub</h2>
+                <p>Compare & Apply with 25+ Top Banks & NBFCs in India.</p>
+            </div>
+
+            <h3 style="padding: 0 20px; margin-bottom: 15px;">All Loan Categories</h3>
+            <div class="services-grid">
+                <div class="service-item" onclick="openPartners('Personal Loan')"><div class="service-icon"><i class="fa-solid fa-wallet"></i></div><span>Personal<br>Loan</span></div>
+                <div class="service-item" onclick="openPartners('Home Loan')"><div class="service-icon"><i class="fa-solid fa-house"></i></div><span>Home<br>Loan</span></div>
+                <div class="service-item" onclick="openPartners('Business Loan')"><div class="service-icon"><i class="fa-solid fa-chart-pie"></i></div><span>Business<br>Loan</span></div>
+                <div class="service-item" onclick="openPartners('Education Loan')"><div class="service-icon"><i class="fa-solid fa-graduation-cap"></i></div><span>Education<br>Loan</span></div>
+                <div class="service-item" onclick="openPartners('Gold Loan')"><div class="service-icon"><i class="fa-solid fa-coins"></i></div><span>Gold<br>Loan</span></div>
+                <div class="service-item" onclick="openPartners('Car Loan')"><div class="service-icon"><i class="fa-solid fa-car"></i></div><span>Car/Auto<br>Loan</span></div>
+            </div>
+        </div>
+
+        <div id="partnerScreen" class="screen">
+            <div class="back-header">
+                <i class="fa-solid fa-angle-left" onclick="goBack()"></i>
+                <h2 id="loanCategoryTitle">Loan Banks</h2>
+            </div>
+            <div class="partner-list" id="partnerListContainer"></div>
+        </div>
+
+    </div>
+
+    <script>
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        // --- BROWSER LOCAL STORAGE (Acting like a Database) ---
+        let currentEmail = "";
+        let demoOTP = "1234"; 
+
+        window.onload = function() {
+            const savedEmail = localStorage.getItem('urbanFincropUser');
+            if(savedEmail) {
+                setDashboardData(savedEmail);
+                switchScreen('homeScreen');
+            }
+        };
+
+        function setDashboardData(email) {
+            document.getElementById('displayUserEmail').innerText = email;
+            document.getElementById('userAvatar').innerText = email.charAt(0).toUpperCase();
+        }
+
+        function sendDemoOTP() {
+            const email = document.getElementById('emailInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if(email === "" || !email.includes("@")) {
+                errorMsg.innerText = "Please enter a valid email!";
+                errorMsg.style.display = "block";
+                return;
+            }
+
+            errorMsg.style.display = "none";
+            currentEmail = email;
+            
+            document.getElementById('emailSection').style.display = "none";
+            document.getElementById('otpSection').style.display = "block";
+            
+            // SMART ALERT: Shows OTP to user immediately without needing an API
+            alert(`Demo Mode: An OTP has been sent. Your testing OTP is: ${demoOTP}`);
+        }
+
+        function verifyDemoOTP() {
+            const userOTP = document.getElementById('otpInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            if(userOTP === demoOTP) {
+                errorMsg.style.display = "none";
+                localStorage.setItem('urbanFincropUser', currentEmail);
+                setDashboardData(currentEmail);
+                resetAuth();
+                switchScreen('homeScreen');
+            } else {
+                errorMsg.innerText = "Invalid OTP! Use 1234.";
+                errorMsg.style.display = "block";
+            }
+        }
+
+        function resetAuth() {
+            document.getElementById('emailInput').value = "";
+            document.getElementById('otpInput').value = "";
+            document.getElementById('emailSection').style.display = "block";
+            document.getElementById('otpSection').style.display = "none";
+            document.getElementById('errorMsg').style.display = "none";
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('urbanFincropUser');
+            switchScreen('authScreen');
+        }
+
+        // --- MEGA DATA OF BANKS ---
+        const allPartners = [
+            { name: "State Bank of India", short: "SBI", type: "Govt. Bank", rate: "9.8%", max: "₹50 Lakhs", time: "3 Days" },
+            { name: "HDFC Bank", short: "HDFC", type: "Pvt. Bank", rate: "10.25%", max: "₹50 Lakhs", time: "12 Hrs" },
+            { name: "Bajaj Finserv", short: "BAJAJ", type: "Top NBFC", rate: "11.0%", max: "₹40 Lakhs", time: "Instant" }
+        ];
+
+        function openPartners(category) {
+            switchScreen('partnerScreen');
+            document.getElementById('loanCategoryTitle').innerText = category;
+            const container = document.getElementById('partnerListContainer');
+            container.innerHTML = ""; 
+
+            allPartners.forEach(partner => {
+                container.innerHTML += `
+                    <div class="partner-card">
+                        <div class="partner-top">
+                            <div class="partner-brand">
+                                <div class="p-logo">${partner.short}</div>
+                                <div><div class="p-name">${partner.name}</div><div class="p-type">${partner.type}</div></div>
+                            </div>
+                        </div>
+                        <div class="partner-stats">
+                            <div class="stat"><span>Interest</span><strong>${partner.rate}</strong></div>
+                            <div class="stat"><span>Max Amount</span><strong>${partner.max}</strong></div>
+                            <div class="stat"><span>Disbursal</span><strong>${partner.time}</strong></div>
+                        </div>
+                        <button class="apply-btn" onclick="alert('Applying for ${category} at ${partner.name}...')">Apply Now</button>
+                    </div>
+                `;
+            });
+        }
+
+        function goBack() { switchScreen('homeScreen'); }
+    </script>
+</body>
+</html>
